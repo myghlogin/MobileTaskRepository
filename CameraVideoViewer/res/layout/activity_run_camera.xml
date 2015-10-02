@@ -9,15 +9,15 @@
     tools:context="ru.webinar.cameravideoviewer.RunCameraActivity" 
     android:orientation="vertical">
 
-    <TextView
+    <FrameLayout android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/explanation"
-        android:layout_marginBottom="@dimen/explanation_bottom_margin" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <Button android:id="@+id/run_camera_app_btn"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/run_camera_app" />
+        android:layout_gravity="center_horizontal"
+        android:text="@string/run_camera_app"/>
 
 </LinearLayout>
