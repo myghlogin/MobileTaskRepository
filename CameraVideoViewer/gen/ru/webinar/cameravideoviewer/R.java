@@ -34,8 +34,6 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f050000;
-        public static final int explanation=0x7f050002;
-        public static final int no_camera_app_error_message=0x7f050003;
         public static final int run_camera_app=0x7f050001;
     }
     public static final class style {

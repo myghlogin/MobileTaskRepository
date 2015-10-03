@@ -3,7 +3,5 @@
 
     <string name="app_name">Camera Video Viewer</string>
     <string name="run_camera_app">Run Camera App</string>
-    <string name="explanation">Press the button below to capture video in a camera application</string>
-    <string name="no_camera_app_error_message">No camera application was found</string>
     
 </resources>

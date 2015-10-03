@@ -2,7 +2,5 @@
 <resources>
 
     <string name="run_camera_app">Запустить камеру</string>
-    <string name="explanation">Нажмите кнопку ниже, чтобы получить видео с камеры</string>
-    <string name="no_camera_app_error_message">Не найдено ни одного приложения, работающего с камерой</string>
     
 </resources>

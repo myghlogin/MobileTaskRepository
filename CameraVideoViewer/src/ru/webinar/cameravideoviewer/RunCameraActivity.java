@@ -1,16 +1,10 @@
 package ru.webinar.cameravideoviewer;
 
-import ru.webinar.camera.CameraPreview;
-import ru.webinar.camera.CameraUtils;
-import ru.webinar.camera.UnaccessibleCameraException;
+import ru.webinar.camera.*;
+import ru.webinar.camera.exception.StartCaptureException;
+import ru.webinar.camera.exception.UnaccessibleCameraException;
 import android.app.Activity;
-import android.content.Intent;
-import android.hardware.Camera;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,18 +13,15 @@ import android.widget.Toast;
 
 public class RunCameraActivity extends Activity implements OnClickListener
 {
-    private CameraPreview cameraPreview;
-    private FrameLayout frame;
-    private Camera backCamera;
+    private FrameLayout frameContainer;
+    private CameraAccess backCamera;
     
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		Log.d("CVV", "activity created");
         
         initUI();
-        
-		Log.d("CVV", "activity created");
+        initCameraAndItsUI();
     }
 	
 	private void initUI(){
@@ -41,27 +32,8 @@ public class RunCameraActivity extends Activity implements OnClickListener
 	}
 
 	private void initCameraAndItsUI(){
-		try{
-			configureCameraAndItsUI();
-		} catch(UnaccessibleCameraException e){
-			showToast("Camera ia unaccessible");
-		}
-	}
-	
-	private void configureCameraAndItsUI() throws UnaccessibleCameraException {
-    	backCamera = CameraUtils.getBackCameraInstance();
-    	configureViewToOutputCameraImage(backCamera);
-	}
-	
-	private void configureViewToOutputCameraImage(Camera camera){
-    	cameraPreview = new CameraPreview(this, camera);
-    	cameraPreview.setVisibility(View.INVISIBLE);
-    	frame = (FrameLayout)findViewById(R.id.camera_preview);
-    	frame.addView(cameraPreview);
-	}
-	
-	private void showToast(String message){
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+		frameContainer = (FrameLayout)findViewById(R.id.camera_preview);
+		backCamera = new CameraAPI1(this, frameContainer); 
 	}
 	
 	@Override
@@ -69,44 +41,32 @@ public class RunCameraActivity extends Activity implements OnClickListener
 	{
 		int viewId = v.getId();
 		if(viewId == R.id.run_camera_app_btn) {
-			cameraPreview.setVisibility(View.VISIBLE);
+			try {
+				backCamera.startCapture();
+			} catch (StartCaptureException e) {
+				showToast(e.getMessage());
+			}
 		}
-		
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Log.d("CVV", "activity paused");
-
-		//backCamera.release();
+	private void showToast(String message){
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 	@Override
 	protected void onStart() {
-		Log.d("CVV", "activity started");
 		super.onStart();
-		initCameraAndItsUI();
+		try {
+			backCamera.openCamera();
+		} catch (UnaccessibleCameraException e) {
+			showToast(e.getMessage());
+		}
 	}
-
-	@Override
-	protected void onResume() {
-		Log.d("CVV", "activity resumed");
-		super.onResume();
-	}
-
-	@Override
-	protected void onStop() {
-		Log.d("CVV", "activity stoped");
-		super.onStop();
-	}
-
-	@Override
-	protected void onDestroy() {
-		Log.d("CVV", "activity destroyed");
-		super.onDestroy();
-	}
-    
 	
+	@Override
+	protected void onPause() {
+		backCamera.stopAndReleaseCamera();
+		super.onPause();
+	}
 
 }

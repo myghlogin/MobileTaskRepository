@@ -2,9 +2,12 @@ package ru.webinar.camera;
 
 import java.io.IOException;
 
+import ru.webinar.camera.exception.StartCaptureException;
+import ru.webinar.camera.exception.UnaccessibleCameraException;
+
 import android.content.Context;
+import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.view.View;
 import android.view.ViewGroup;
 
 public class CameraAPI1 extends AbstractCamera implements CameraAccess 
@@ -19,35 +22,47 @@ public class CameraAPI1 extends AbstractCamera implements CameraAccess
 		surfaceContainer.addView(surface);
 	}
 	
-	public void openCamera() throws UnaccessibleCameraException 
+	public void openCamera()
 	{
 		try{
 			camera = Camera.open();
 		} catch(Exception e){
-			// camera is not available (in use or does not exist)
 			throw new UnaccessibleCameraException(e);
 		}
 		
 		if(camera == null)
-			throw new UnaccessibleCameraException(); 
+			throw new UnaccessibleCameraException("Device does not have back-facing camera"); 
 	}
 	
-	public void startCapture() throws StartCaptureException {
+	public void startCapture() {
 		try {
-			if(surface.isSurfaceCreated()){
-				camera.setPreviewDisplay(surface.getHolder());
-				camera.startPreview();
-			}
-			else{
-				throw new StartCaptureException("Surface is not created");
-			}
+			configureCameraAndStartPreview();
 		} catch (IOException e) {
 			throw new StartCaptureException(e);
 		}
 	}
 	
+	private void configureCameraAndStartPreview() throws IOException {
+		if(surface.isSurfaceAvaliable()){
+			rotateImageIfPortraitOrientation();
+			startPreview();
+		}
+		else
+			throw new StartCaptureException("Surface is not avaliable");
+	}
+	
+	private void rotateImageIfPortraitOrientation(){
+		if(AbstractCamera.getScreenOrientation(context) == Configuration.ORIENTATION_PORTRAIT)
+			camera.setDisplayOrientation(90);
+	}
+	
+	private void startPreview() throws IOException{
+		camera.setPreviewDisplay(surface.getHolder());
+		camera.startPreview();
+	}
+	
 	public void stopAndReleaseCamera(){
-		if(surface.isSurfaceCreated()){
+		if(surface.isSurfaceAvaliable()){
 			camera.stopPreview();
 		}
 		camera.release();

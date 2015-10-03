@@ -3,7 +3,7 @@ package ru.webinar.camera;
 import android.content.Context;
 import android.view.ViewGroup;
 
-public abstract class AbstractCamera 
+abstract class AbstractCamera 
 {
 	protected ViewGroup surfaceContainer;
 	protected Context context;
@@ -14,5 +14,9 @@ public abstract class AbstractCamera
 		
 		this.surfaceContainer = surfaceContainer;
 		this.context = context;
+	}
+	
+	public static int getScreenOrientation(Context targetContext){    
+		return targetContext.getResources().getConfiguration().orientation;
 	}
 }
